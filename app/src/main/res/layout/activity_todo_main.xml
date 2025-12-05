@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/photo1">
+
+    <!-- 输入区域 -->
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="148dp"
+        android:text="ToDos"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/input_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 输入框 -->
+
+        <!-- 添加按钮 -->
+
+        <EditText
+            android:id="@+id/input_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:hint="添加事项"
+            android:inputType="textCapSentences|textMultiLine"
+            android:imeOptions="actionDone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/add_button"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <ImageButton
+            android:id="@+id/add_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="添加"
+            android:background="@drawable/add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/input_edit_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- 待办事项列表 -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/list_header"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_container">
+
+        <TextView
+            android:id="@+id/hide_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="隐藏已办"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Switch
+            android:id="@+id/switch_hide_done"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleX="1.3"
+            android:scaleY="1.3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/list_header" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/list_header"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/done"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@+id/done"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/back"
+            android:contentDescription="返回" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/checkdone_tool"
+        android:layout_width="60dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@+id/donethings"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/donecheck"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/todocheck"
+            android:contentDescription="已完成的待办" />
+    </androidx.appcompat.widget.Toolbar>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

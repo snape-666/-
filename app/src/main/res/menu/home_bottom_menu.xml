@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home_menu"
+        android:icon="@drawable/home"
+        android:title="首页"/>
+    <item
+        android:id="@+id/todo_menu"
+        android:icon="@drawable/todo"
+        android:title="待办"/>
+    <item
+        android:id="@+id/clock_menu"
+        android:icon="@drawable/clock"
+        android:title="番茄钟"/>
+    <item
+        android:id="@+id/edit_menu"
+        android:icon="@drawable/edit"
+        android:title="便签"/>
+
+</menu>
