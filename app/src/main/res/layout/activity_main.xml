@@ -89,34 +89,57 @@
             android:textSize="20sp"
             android:layout_marginTop="2dp"
             android:layout_marginStart="83dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Your efforts will be rewarded"
-            android:textSize="20sp"
+            android:layout_marginStart="60dp"
             android:layout_marginTop="28dp"
-            android:layout_marginStart="60dp"/>
+            android:text="Your efforts will be rewarded"
+            android:textSize="20sp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="55dp"
             android:text="Just do it!"
             android:textSize="25sp"
-            android:textStyle="bold"
-            android:layout_marginTop="55dp"
-            android:layout_marginStart="120dp"/>
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/focus"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="67dp"
-            android:layout_marginTop="100dp"
             android:layout_marginStart="200dp"
+            android:layout_marginTop="100dp"
             android:background="@drawable/btn_transparent_border"
-            android:text="Focus On"
+            android:text="Start Focus"
             android:textColor="@color/black"
             android:textSize="20sp" />
+
     </androidx.cardview.widget.CardView>
 
+    <TextView
+        android:id="@+id/tv_todo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="ToDos"
+        android:textSize="20sp"
+        android:background="@drawable/input_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_layout" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_todos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_todo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

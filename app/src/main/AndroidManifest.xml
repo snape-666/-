@@ -46,6 +46,13 @@
             android:name=".AddNoteActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".DoneListActivity"
+            android:exported="true" />
+
+
+
+
 
 
 

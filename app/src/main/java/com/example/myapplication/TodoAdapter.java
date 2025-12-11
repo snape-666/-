@@ -27,6 +27,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
 
     public interface OnTodoClickListener {
         void onDeleteClick(int position);
+
         void onItemClick(int position);
     }
 
@@ -73,7 +74,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
             if (listener != null) {
                 listener.onDeleteClick(position);
             }
-            animateCompletion(holder);
+            //animateCompletion(holder);
         });
 
         holder.itemView.setOnClickListener(v -> {
@@ -129,6 +130,12 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
     public void onItemDismiss(int position) {
         todoList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void updateTodoList(List<Todo> newTodoList) {
+        this.todoList.clear();
+        this.todoList.addAll(newTodoList);
+        notifyDataSetChanged();
     }
 
     public static class TodoViewHolder extends RecyclerView.ViewHolder {

@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-
 public class MainActivity extends AppCompatActivity {
     private Button btnFocus;
     private BottomNavigationView bottomNavView;

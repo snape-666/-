@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/photo5"
@@ -30,18 +31,16 @@
         app:layout_constraintEnd_toEndOf="@id/progressBar"/>
 
 
-    <Button
+    <ImageButton
         android:id="@+id/giveUpBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="结 束"
-        android:textSize="16sp"
-        android:background="@drawable/btn_transparent_border"
-        android:textColor="@android:color/white"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/pause"
+        android:contentDescription="暂停/开始"
         app:layout_constraintTop_toBottomOf="@id/progressBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/workBtn"
@@ -49,7 +48,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="16dp"
-        android:text="10分钟\n工作"
+        android:text="1分钟\n工作"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/shortRestBtn"
@@ -71,34 +70,35 @@
         android:id="@+id/longRestBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
         android:text="20分钟\n长时休息"
         android:textColor="@android:color/white"
-        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/shortRestBtn"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="16dp"/>
+        app:layout_constraintStart_toEndOf="@id/shortRestBtn" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/Home2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="36dp"
         android:background="@android:color/transparent"
-        android:contentDescription="@+id/Home2"
-        app:cardElevation="4dp"
+        android:contentDescription="@+id/Back"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.949"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <ImageButton
             android:id="@+id/back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/back"
+            android:contentDescription="back"
             android:clickable="true"
-            android:gravity="center"
-            android:text="返回"
-            android:textSize="48sp" />
+            android:gravity="center" />
     </androidx.appcompat.widget.Toolbar>
 </androidx.constraintlayout.widget.ConstraintLayout>
