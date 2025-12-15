@@ -30,4 +30,5 @@ public interface TodoDao {
     // 7. 查询未完成的待办：筛选isCompleted=false的记录
     @Query("SELECT * FROM todo_table WHERE isCompleted = 0 ORDER BY timestamp DESC")
     List<Todo> getUndoneTodos();
+
 }

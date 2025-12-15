@@ -45,6 +45,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     public boolean isUsernameExists(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query("User", null, "username like ?", new String[]{username}, null, null, null);
+
         boolean exists = false;
         if (cursor != null) {
             exists = cursor.getCount() > 0;
@@ -74,7 +75,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
                 null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
-            login = true; //
+            login = true;
             cursor.close();
         }
 

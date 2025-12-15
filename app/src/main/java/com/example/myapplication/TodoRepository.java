@@ -12,12 +12,12 @@ public class TodoRepository {
         this.todoDao = todoDao;
 
     }
-    public void getUndoneTodos(OnTodosLoadedListener listener) {
+  /*  public void getUndoneTodos(OnTodosLoadedListener listener) {
         executor.execute(() -> {
             List<Todo> undoneTodos = todoDao.getUndoneTodos(); // 调用Dao的查询方法
             listener.onLoaded(undoneTodos);
         });
-    }
+    }*/
     // 1. 新增待办（异步）
     public void addTodo(Todo todo) {
         executor.execute(() -> todoDao.insertTodo(todo));

@@ -1,6 +1,7 @@
 package com.example.myapplication.javabean;
 
 public class User {
+    private int id;
     private String etRegUsername;
     private String etRegPassword;
     public User(){
@@ -10,19 +11,30 @@ public class User {
         this.etRegPassword=etRegPassword;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getEtRegUsername() {
         return etRegUsername;
     }
+
+
 
     public String getEtRegPassword() {
         return etRegPassword;
     }
 
-    public void setEtUsername(String etRegUsername) {
+
+    public void setEtRegUsername(String etRegUsername) {
         this.etRegUsername = etRegUsername;
     }
 
-    public void setEtPassword(String etRegPassword) {
+    public void setEtRegPassword(String etRegPassword) {
         this.etRegPassword = etRegPassword;
     }
 
