@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.util.Date;
 public class AddNoteActivity extends AppCompatActivity {
@@ -16,6 +17,8 @@ public class AddNoteActivity extends AppCompatActivity {
     private Button btnAddNote;
     private ImageButton ibBack;
     private NoteDatabase noteDatabase;
+    private boolean isEditMode=false;
+    private int editNoteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,17 @@ public class AddNoteActivity extends AppCompatActivity {
 
         noteDatabase = NoteDatabase.getInstance(this);
 
+        Intent intent = getIntent();
+        if (intent.hasExtra("NOTE_ID")) {
+            isEditMode = true;
+            editNoteId = intent.getIntExtra("NOTE_ID", -1);
+            String title = intent.getStringExtra("NOTE_TITLE");
+            String content = intent.getStringExtra("NOTE_CONTENT");
+            etTitle.setText(title);
+            etContent.setText(content);
+            btnAddNote.setText("保存修改");
+        }
+
         btnAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -38,28 +52,48 @@ public class AddNoteActivity extends AppCompatActivity {
                 String title = etTitle.getText().toString().trim();
                 String content = etContent.getText().toString().trim();
 
+                if (title.isEmpty()) {
+                    Toast.makeText(AddNoteActivity.this, "标题不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 long modifiedTime = new Date().getTime();
 
+                Note note = new Note(title, content, modifiedTime);
+
+                // 新增：编辑模式下设置ID并执行更新
+                if (isEditMode) {
+                    note.setId(editNoteId);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            noteDatabase.noteDao().updateNote(note);
+                            runOnUiThread(() -> {
+                                Toast.makeText(AddNoteActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
+                        }
+                    }).start();
+                } else {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         noteDatabase.noteDao().insertNote(new Note(title, content, modifiedTime));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                finish();
-                            }
+                        runOnUiThread(() -> {
+                            Toast.makeText(AddNoteActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                            finish();
                         });
                     }
                 }).start();
+                }
             }
         });
-
     }
     private void setupClickListeners() {
         ibBack.setOnClickListener(v-> {
             Intent intent = new Intent(AddNoteActivity.this, NoteActivity.class);
             startActivity(intent);
+            finish();
         });
     }
 }

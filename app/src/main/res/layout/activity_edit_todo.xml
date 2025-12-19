@@ -13,7 +13,7 @@
         android:id="@+id/tv_edit_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="116dp"
+        android:layout_marginTop="95dp"
         android:text="修改待办"
         android:textSize="40sp"
         android:textStyle="bold"

@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,16 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     private List<Note> noteList;
     private SimpleDateFormat sdf = new SimpleDateFormat("MM-dd, HH:mm", Locale.getDefault());
 
-    public NoteAdapter(Context context, List<Note> noteList) {
+    OnNoteDeleteListener deleteListener;
+
+    public interface OnNoteDeleteListener{
+        void onDeleteNote(int noteId);
+    }
+
+    public NoteAdapter(Context context, List<Note> noteList,OnNoteDeleteListener deleteListener) {
         this.context = context;
         this.noteList = noteList;
+        this.deleteListener=deleteListener;
     }
 
     @NonNull
@@ -34,6 +42,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         holder.tvTitle.setText(note.getTitle());
         holder.tvContent.setText(note.getContent());
         holder.tvTime.setText("Modified at " + sdf.format(note.getModifiedTime()));
+        holder.itemView.setOnClickListener(v->{
+            Intent intent=new Intent(context,AddNoteActivity.class);
+            intent.putExtra("NOTE_ID",note.getId());
+            intent.putExtra("NOTE_TITLE",note.getTitle());
+            intent.putExtra("NOTE_CONTENT",note.getContent());
+            intent.putExtra("NOTE_TIME",note.getModifiedTime());
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -44,6 +60,18 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public void refreshNotes(List<Note> newNotes) {
         this.noteList = newNotes;
         notifyDataSetChanged();
+    }
+
+    public void removeNoteById(int noteId) {
+        if (noteList == null) return;
+        for (int i = 0; i < noteList.size(); i++) {
+            if (noteList.get(i).getId() == noteId) {
+                noteList.remove(i);
+                notifyItemRemoved(i); // 带动画的删除
+                notifyItemRangeChanged(i, noteList.size()); // 刷新后续项的位置
+                break;
+            }
+        }
     }
 
     public static class NoteViewHolder extends RecyclerView.ViewHolder {

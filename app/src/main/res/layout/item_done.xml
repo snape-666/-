@@ -8,10 +8,7 @@
     android:background="@drawable/white_border"
     android:padding="16dp">
 
-    <!-- 完成状态复选框 -->
 
-    <!-- 删除按钮 -->
-    <!-- 时间显示 -->
 
     <CheckBox
         android:id="@+id/checkbox2"

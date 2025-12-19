@@ -35,6 +35,7 @@ public class EditTodoActivity extends AppCompatActivity {
             return;
         }
         bindViews();
+        initViews();
         new Thread(() -> {
             todo = TodoDatabase.getInstance(this).getTodoDao().getTodoById(todoId);
             runOnUiThread(() -> {
@@ -42,7 +43,6 @@ public class EditTodoActivity extends AppCompatActivity {
                     finish();
                     return;
                 }
-                initViews();
 
                 etContent.setText(todo.getContent());
                 etDesc.setText(todo.getDescription() != null ? todo.getDescription() : "");
@@ -80,6 +80,38 @@ public class EditTodoActivity extends AppCompatActivity {
             loadTodoData();
         }
         btnCancel.setOnClickListener(v -> finish());
+        btnSave.setOnClickListener(v -> {
+            String content = etContent.getText().toString().trim();
+            if (content.isEmpty()) {
+                Toast.makeText(this, "请填写待办标题", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (todo == null) {
+                Toast.makeText(this, "待办数据未加载完成", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            todo.setContent(content);
+            todo.setDescription(etDesc.getText().toString().trim());
+            todo.setDeadline(deadline);
+            todo.setRemindTime(remindTime);
+
+            if (todo.getAccount() == null || todo.getAccount().isEmpty()) {
+                todo.setAccount(currentAccount);
+            }
+
+            new Thread(() -> {
+                repo.updateTodo(todo);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+                    TodoMain.shouldRefreshMain = true;
+                    finish();
+                });
+            }).start();
+        });
+
+
     }
 
     private void loadTodoData() {

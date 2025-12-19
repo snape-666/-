@@ -75,12 +75,11 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
         else {
             holder.deadlineTextView.setVisibility(View.GONE);
         }
-        //使用标签存储id,避免位置错乱
+
         holder.itemView.setTag(todo.getId());
         holder.checkBox.setTag(todo.getId());
         holder.deleteButton.setTag(todo.getId());
 
-        // 设置完成状态样式
         if (todo.isCompleted()) {
             holder.contentTextView.setPaintFlags(holder.contentTextView.getPaintFlags()
                     | Paint.STRIKE_THRU_TEXT_FLAG);

@@ -155,7 +155,7 @@ public class TomatoClock extends AppCompatActivity {
             lp.width = (int) (getResources().getDisplayMetrics().widthPixels * 0.7);
             lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             lp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-            lp.y = 200;
+            lp.y = 180;
             window.setAttributes(lp);
             window.setBackgroundDrawableResource(android.R.color.transparent);
         }

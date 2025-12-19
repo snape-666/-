@@ -28,6 +28,7 @@
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
             android:text="账号："
             android:textColor="@color/black"
             android:textSize="32sp"
@@ -40,6 +41,7 @@
             android:id="@+id/et_reg_username"
             android:layout_width="0dp"
             android:layout_height="49dp"
+            android:layout_marginEnd="30dp"
             android:hint="请输入账号"
             android:inputType="textVisiblePassword"
             android:maxLength="12"
@@ -79,24 +81,27 @@
             android:id="@+id/confirm_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="确认密码："
+            android:text="确认\n密码:"
             android:textColor="@color/black"
-            android:textSize="32dp"
+            android:textSize="25dp"
             app:layout_constraintStart_toStartOf="@id/username"
             app:layout_constraintTop_toBottomOf="@id/et_reg_password"
             />
 
-        <EditText
-            android:id="@+id/et_confirm_password"
-            android:layout_width="0dp"
-            android:layout_height="49dp"
-            android:hint="请重新输入密码"
-            android:maxLength="16"
-            android:inputType="textPassword"
-            app:layout_constraintStart_toEndOf="@id/confirm_password"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_reg_password"
-            app:layout_constraintBottom_toBottomOf="@id/confirm_password"/>
+    <EditText
+        android:id="@+id/et_confirm_password"
+        android:layout_width="0dp"
+        android:layout_height="49dp"
+        android:layout_marginEnd="30dp"
+        android:hint="请重新输入密码"
+        android:inputType="textPassword"
+        android:maxLength="16"
+        app:layout_constraintBottom_toBottomOf="@id/confirm_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/confirm_password"
+        app:layout_constraintTop_toBottomOf="@+id/et_reg_password"
+        app:layout_constraintVertical_bias="0.545" />
 
     <Button
         android:id="@+id/btn_register_confirm"

@@ -164,7 +164,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:translationX="300dp"> <!-- 初始状态：向右偏移自身宽度，隐藏在屏幕外 -->
 
-        <!-- 关闭按钮 -->
+
         <ImageButton
             android:id="@+id/btn_close_panel"
             android:layout_width="40dp"
@@ -175,7 +175,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 头像区域 -->
+
         <ImageView
             android:id="@+id/iv_avatar"
             android:layout_width="100dp"
@@ -349,7 +349,7 @@
             android:id="@+id/btn_save_info"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginBottom="84dp"
+            android:layout_marginBottom="50dp"
             android:background="@drawable/user_info"
             android:elevation="4dp"
             android:text="保存修改"
