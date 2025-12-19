@@ -72,20 +72,9 @@ public class DoneAdapter extends RecyclerView.Adapter<DoneAdapter.DoneViewHolder
        diffResult.dispatchUpdatesTo(this); // 仅刷新变化的项
    }
 
-   //局部移除项的方法
-   /* public void removeItem(int position){
-       if(position>=0&&position<doneList.size()){
-           doneList.remove(position);
-           notifyItemRemoved(position);
-       }
-    }*/
+
    public void removeItem(long todoId) {
-     /* if (position >= 0 && position < doneList.size()) {
-           doneList.remove(position);
-           notifyItemRemoved(position);
-           // 通知后续项位置更新，避免索引错乱
-           notifyItemRangeChanged(position, doneList.size() - position);
-       }*/
+
        int positionToRemove = -1;
        for (int i = 0; i < doneList.size(); i++) {
            if (doneList.get(i).getId() == todoId) {

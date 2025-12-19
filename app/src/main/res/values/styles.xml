@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- 空配置，使用系统默认颜色 -->
+    </style>
+
+
+    <style name="TransparentDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item> <!-- 背景透明 -->
+        <item name="android:windowIsFloating">true</item> <!-- 悬浮弹窗 -->
+        <item name="android:windowNoTitle">true</item> <!-- 隐藏标题栏 -->
+        <item name="android:windowContentOverlay">@null</item> <!-- 取消阴影 -->
+    </style>
+</resources>

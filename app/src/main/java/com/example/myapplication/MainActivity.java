@@ -2,11 +2,12 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.net.Uri;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,27 +24,40 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.app.DatePickerDialog;
 import android.provider.MediaStore;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
 
 
 public class MainActivity extends AppCompatActivity {
-    private Button btnFocus,btnSaveInfo,btnLogOut;
+    private Button btnFocus, btnSaveInfo, btnLogOut;
     private BottomNavigationView bottomNavView;
-    private ImageButton btnUserInfo,btnClosePanel;
-    private TextView homeTitle,tvAccount,tvEditAvatar,etBirthday;
+    private ImageButton btnUserInfo, btnClosePanel;
+    private TextView homeTitle, tvAccount, tvEditAvatar, etBirthday;
     private int currentNavItemId = R.id.todo_menu;
     private View sideUserPanel;
     private ImageView ivAvatar;
     private EditText etPassword;
     private RadioGroup rgGender;
+    private MySQLiteOpenHelper dbHelper;
     private SharedPreferences sp;
-    private static final String SP_NAME="user_info";
+    private static final String SP_NAME = "user_info";
     private Uri avatarUri;
-    private boolean isPanelOpen=false;
+    private boolean isPanelOpen = false;
+    private String currentAccount;
+    private RecyclerView rvHomeTodo;
+    private TodoAdapter homeTodoAdapter;
+    private List<Todo> homeTodoList = new ArrayList<>();
+    private TodoRepository homeTodoRepo;
 
     //头像选择启动器
     private final ActivityResultLauncher<Intent> pickAvatarLauncher = registerForActivityResult(
@@ -60,20 +74,31 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        //存储用户信息
-        sp=getSharedPreferences(SP_NAME,MODE_PRIVATE);
+
+        dbHelper = new MySQLiteOpenHelper(this);
+        sp = getSharedPreferences(SP_NAME, MODE_PRIVATE);
+        currentAccount = sp.getString("account", "");
+        if (currentAccount.isEmpty()){
+            currentAccount="default_user_"+ Build.SERIAL;
+            sp.edit().putString("account",currentAccount).apply();
+            Log.d("MainActivity","账号为空,使用空账号"+currentAccount);
+        }
+
         initViews();
+        initHomeTodoList();
         setupClickListeners();
         setupBottomNavigation();
         bottomNavView = findViewById(R.id.bottom_nav_view);
         bottomNavView.setSelectedItemId(R.id.home_menu);
-        loadUserInfo();//加载保存的用户信息
+        loadUserInfo();
+        loadHomeTodoData();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -82,22 +107,104 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-      /*  ibBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Toast.makeText(MainActivity.this, "返回登录界面", Toast.LENGTH_SHORT).show();
-
-
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });*/
-
-
     }
 
+    private void initHomeTodoList() {
+        rvHomeTodo = findViewById(R.id.rv_todos);
+        if (rvHomeTodo == null) {
+            Log.e("MainActivity", "RecyclerView not found");
+            return;
+        }
+        rvHomeTodo.setLayoutManager(new LinearLayoutManager(this));
+        homeTodoList = new ArrayList<>();
+        TodoDatabase db = TodoDatabase.getInstance(this);
+        TodoDao todoDao = db.getTodoDao();
+        homeTodoRepo = new TodoRepository(todoDao);
+
+        homeTodoAdapter = new TodoAdapter(homeTodoList, new TodoAdapter.OnTodoClickListener() {
+           @Override
+           public void onDeleteClick(int position) {
+                if (position>=0&&position<homeTodoList.size()){
+                    Todo todo=homeTodoList.get(position);
+                    homeTodoRepo.deleteTodo(todo);
+                    homeTodoList.remove(position);
+                    homeTodoAdapter.notifyItemRemoved(position);
+                    loadHomeTodoData();
+                }
+            }
+
+            @Override
+            public void onItemClick(int position) {
+                    List<Todo> filteredList = homeTodoList;
+                    if (position >= 0 && position < filteredList.size()) {
+                        Todo todo = filteredList.get(position);
+                        Intent intent = new Intent(MainActivity.this, EditTodoActivity.class);
+                        intent.putExtra("TODO_ID",todo.getId());
+                        startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCheckboxClick(int position, boolean newState) {
+                // 单击复选框修改状态
+                    if (position >= 0 && position < homeTodoList.size()) {
+                        Todo todo = homeTodoList.get(position);
+                        todo.setCompleted(newState);
+                        homeTodoRepo.updateTodo(todo);
+                        homeTodoAdapter.notifyItemChanged(position);
+                        if (newState) {
+                            homeTodoList.remove(position);
+                            homeTodoAdapter.notifyItemRemoved(position);
+                            Toast.makeText(MainActivity.this, "待办已完成", Toast.LENGTH_SHORT).show();
+                            loadHomeTodoData();
+                        }
+                    }
+                }
+        }, new TodoViewModel());
+        rvHomeTodo.setAdapter(homeTodoAdapter);
+        rvHomeTodo.post(()->{
+            if (homeTodoAdapter!=null){
+                homeTodoAdapter.notifyDataSetChanged();
+                Log.d("MainActivity","强制刷新RecyclerView");
+            }
+            int width=rvHomeTodo.getWidth();
+            int height=rvHomeTodo.getHeight();
+            Log.d("MainActivity","RecyclerView宽高:"+width+"X"+height);
+        });
+    }
+
+
+
+    private void loadHomeTodoData() {
+        if (homeTodoRepo==null||currentAccount.isEmpty()){
+            Log.e("MainActivity","Repo或账号为空:account="+currentAccount);
+            Toast.makeText(this,"加载失败:数据初始化异常",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.d("MainActivity","开始查询账号:"+currentAccount+"的Todo数据");
+        homeTodoRepo.getTodosByAccount(currentAccount,todos -> {
+                runOnUiThread(() -> {
+                    Log.d("MainActivity","数据库返回数据总数:"+todos.size());
+                    List<Todo>newHomeTodoList=new ArrayList<>();
+                        for (Todo todo : todos) {
+                            if (!todo.isCompleted()) {
+                                newHomeTodoList.add(todo);
+                                Log.d("MainActivity","筛选出未完成Todo:"+todo.getContent());
+                            }
+                        }
+                        Log.d("MainActivity","Main页最终待展示数量:"+newHomeTodoList.size());
+                        if (newHomeTodoList.isEmpty()){
+                            Toast.makeText(this,"暂无待办事项",Toast.LENGTH_SHORT).show();
+                        }
+                        if (homeTodoAdapter!=null){
+                        homeTodoAdapter.updateTodoList(newHomeTodoList);
+                        rvHomeTodo.post(()->homeTodoAdapter.notifyDataSetChanged());
+                        }else {
+                            Log.e("MainActivity","Adapter未初始化");
+                        }
+                });
+            });
+    }
 
     private void initViews() {
         bottomNavView = findViewById(R.id.bottom_nav_view);
@@ -119,13 +226,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void setupClickListeners() {
-        // 聚焦按钮
         btnFocus.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, TomatoClock.class);
             startActivity(intent);
         });
 
-        // 打开/关闭侧边面板（点击头像按钮）
+        // 打开/关闭侧边面板
         btnUserInfo.setOnClickListener(v -> {
             if (isPanelOpen) {
                 closeUserPanel();
@@ -134,21 +240,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 关闭面板按钮
         btnClosePanel.setOnClickListener(v -> closeUserPanel());
 
-        // 修改头像
         ivAvatar.setOnClickListener(v -> pickAvatar());
         tvEditAvatar.setOnClickListener(v -> pickAvatar());
-
-        // 生日选择
         etBirthday.setOnClickListener(v -> showDatePicker());
-        //退出登录
         btnLogOut.setOnClickListener(v -> showLogOutDialog());
-
-        // 保存用户信息
         btnSaveInfo.setOnClickListener(v -> saveUserInfo());
-
         btnFocus.setOnClickListener(new View.OnClickListener() {
             @Override
 
@@ -160,7 +258,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //打开侧边面板
+    protected void onResume(){
+        super.onResume();
+        updateBottomNavSelection();
+        currentAccount=sp.getString("account","");
+        tvAccount.setText(currentAccount);
+        if(homeTodoRepo!=null&&homeTodoAdapter!=null&&rvHomeTodo!=null){
+            loadHomeTodoData();
+        }
+        if (TodoMain.instance != null && TodoMain.shouldRefreshMain) {
+            loadHomeTodoData();
+            TodoMain.shouldRefreshMain = false;
+        }
+    }
+
     private void openUserPanel(){
         sideUserPanel.setVisibility(View.VISIBLE);
         sideUserPanel.bringToFront();
@@ -171,10 +282,10 @@ public class MainActivity extends AppCompatActivity {
                 .start();
         isPanelOpen = true;
     }
-    //关闭侧边面板(平移动画)
+
     private void closeUserPanel() {
         sideUserPanel.animate()
-                .translationX(300) // 移到屏幕外（面板宽度）
+                .translationX(300) // 移到屏幕外
                 .setDuration(300)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .withEndAction(()->{
@@ -185,13 +296,11 @@ public class MainActivity extends AppCompatActivity {
         sideUserPanel.setVisibility(View.GONE);
         isPanelOpen = false;
     }
-    //选择头像
     private void pickAvatar() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickAvatarLauncher.launch(intent);
     }
 
-    // 日期选择器
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -209,40 +318,35 @@ public class MainActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // 加载用户信息
     private void loadUserInfo() {
-        // 加载头像
+
         String avatarUriStr = sp.getString("avatar_uri", "");
         if (!avatarUriStr.isEmpty()) {
             avatarUri = Uri.parse(avatarUriStr);
             ivAvatar.setImageURI(avatarUri);
             btnUserInfo.setImageURI(avatarUri);
         }
-
-        // 加载账号
-       // tvAccount.setText(sp.getString("account", ""));
-        String loginAccount= sp.getString("account","");
-        tvAccount.setText(loginAccount);
-        // 加载性别
+        tvAccount.setText(currentAccount);
         int gender = sp.getInt("gender", -1);
         if (gender != -1) {
             rgGender.check(gender);
         }
-        // 加载生日
         etBirthday.setText(sp.getString("birthday", ""));
     }
 
-    // 保存用户信息
+
     private void saveUserInfo() {
-        String password = etPassword.getText().toString().trim();
+        String newPassword = etPassword.getText().toString().trim();
         int genderId = rgGender.getCheckedRadioButtonId();
         String birthday = etBirthday.getText().toString().trim();
-
-        String origPassword=sp.getString("password","");
+        String sqlorigPassword= dbHelper.getOriginalPassword(currentAccount);
+        boolean isPasswordChanged=!newPassword.isEmpty()&&!newPassword.equals(sqlorigPassword);
+        if (!newPassword.isEmpty()&&newPassword.equals(sqlorigPassword)){
+            Toast.makeText(this,"新旧密码相同",Toast.LENGTH_SHORT).show();
+            return;
+        }
         int origGender=sp.getInt("gender",-1);
         String origBirthday=sp.getString("birthday","");
-
-        boolean isPasswordChanged=!password.isEmpty()&&!password.equals(origPassword);
         boolean isGenderChanged=genderId!=-1&&genderId!=origGender;
         boolean isBirthdayChanged=!birthday.equals(origBirthday);
         if (!isPasswordChanged&&!isGenderChanged&&!isBirthdayChanged){
@@ -250,88 +354,57 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         SharedPreferences.Editor editor=sp.edit();
-        if (!password.isEmpty()){
-            editor.putString("password",password);
+        if (isPasswordChanged){
+            editor.putString("password",newPassword);
+            boolean updateSuccess=dbHelper.updatePassword(currentAccount,newPassword);
+            if (!updateSuccess){
+                Toast.makeText(this, "密码更新失败", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
+
         editor.putInt("gender",genderId);
         editor.putString("birthday",birthday);
         editor.apply();
         Toast.makeText(this, "信息保存成功", Toast.LENGTH_SHORT).show();
-        closeUserPanel(); // 保存后关闭面板
+        closeUserPanel();
     }
-    private void loginSuccess(String account){
-        SharedPreferences sp=getSharedPreferences("user_info",MODE_PRIVATE);
-        sp.edit().putString("account",account).apply();
-        Intent intent=new Intent(MainActivity.this,LoginActivity.class);
-        startActivity(intent);
-        finish();
-    }
-    // 退出登录确认弹窗
+
+
     private void showLogOutDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("退出登录")
                 .setMessage("确定要退出当前账号吗？")
                 .setPositiveButton("确定", (dialog, which) -> {
-                    // 执行退出登录逻辑
                     logout();
                 })
                 .setNegativeButton("取消", null)
                 .show();
     }
 
-    // 退出登录核心逻辑
     private void logout() {
-        // 1. 清空SharedPreferences中的用户信息
         SharedPreferences.Editor editor = sp.edit();
-        editor.clear(); // 清空所有用户信息（也可针对性删除：editor.remove("avatar_uri")等）
+        editor.clear();
         editor.apply();
-
-        // 2. 重置UI（恢复默认头像、清空输入框）
-        ivAvatar.setImageResource(R.drawable.user_photo); // 恢复默认头像
-        btnUserInfo.setBackgroundResource(R.drawable.user); // 首页头像恢复默认
+        ivAvatar.setImageResource(R.drawable.user_photo);
+        btnUserInfo.setBackgroundResource(R.drawable.user);
         tvAccount.setText("");
         etPassword.setText("");
         rgGender.clearCheck();
         etBirthday.setText("");
 
-        // 3. 关闭侧边面板
         closeUserPanel();
 
-        // 4. 返回登录页面并结束当前页面
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
-        finish(); // 结束MainActivity，避免返回键回到首页
-
-        // 5. 提示退出成功
+        finish();
         Toast.makeText(this, "已退出登录", Toast.LENGTH_SHORT).show();
     }
 
-
-
-
-
-
-
     private void fixBottomNavIconColor() {
-        // 完全清除着色（显示原始颜色）
         bottomNavView.setItemIconTintList(null);
         bottomNavView.setItemTextColor(null);
     }
-
-  /*  private void setupClickListeners() {
-
-
-        btnFocus.setOnClickListener(new View.OnClickListener() {
-            @Override
-
-            public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, TomatoClock.class);
-                startActivity(intent);
-            }
-        });
-    }*/
-
     private void setupBottomNavigation() {
         bottomNavView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -360,50 +433,29 @@ public class MainActivity extends AppCompatActivity {
 
     private void navigateToHome() {
         homeTitle.setText("首页");
-        //refreshHomeContent();
     }
 
     private void navigateToTodo() {
-
-
         Intent intent = new Intent(MainActivity.this, TodoMain.class);
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
     }
 
     private void navigateToClock() {
-
         Intent intent = new Intent(MainActivity.this, TomatoClock.class);
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     private void navigateToEdit() {
-
         Intent intent = new Intent(MainActivity.this, NoteActivity.class);
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
     }
 
-  /* private void refreshHomeContent() {
-        refreshHomeContent();
-        Toast.makeText(this, "已刷新", Toast.LENGTH_SHORT).show();
-    }
-*/
-
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateBottomNavSelection();
-
-    }
 
     private void updateBottomNavSelection() {
-        // 确保bottomNavView已经初始化
         if (bottomNavView == null) {
             return;
         }

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
-import com.example.myapplication.javabean.User;
 
 public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "mySQLite.db";
@@ -70,7 +69,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
             return false;
         }
         userCursor.close();
-        Cursor cursor = db.query("User", null, "username = ? AND password = ?",  // 同时验证用户名和密码
+        Cursor cursor = db.query("User", null, "username = ? AND password = ?",
                 new String[]{username, password},
                 null, null, null);
 
@@ -81,6 +80,27 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
         db.close();
         return login;
+    }
+    public String getOriginalPassword(String username){
+        SQLiteDatabase db=getReadableDatabase();
+        String origPassword="";
+        Cursor cursor=db.query("User",new String[]{"password"},"username=?",new String[]{username},null,null,null);
+        if(cursor!=null&&cursor.moveToFirst()){
+            origPassword=cursor.getString(cursor.getColumnIndexOrThrow("password"));
+            cursor.close();
+        }
+        db.close();
+        return origPassword;
+    }
+    public boolean updatePassword(String username,String newPassword){
+        SQLiteDatabase db=getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("password",newPassword);
+        //根据用户名更新密码
+        int rowsAffected=db.update("User",values,"username=?",new String[]{username});
+        db.close();
+        //受影响数>0表示更新成功
+        return rowsAffected>0;
     }
 
 }

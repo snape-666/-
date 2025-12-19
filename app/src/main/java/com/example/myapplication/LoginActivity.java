@@ -17,6 +17,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername, etPassword;
     private Button btnLogin, btnRegister;
     private SharedPreferences sharedPreferences;
+    private SharedPreferences userInfoSP;
     private SharedPreferences.Editor editor;
     private CheckBox rememberPass;
     private MySQLiteOpenHelper mySQLiteOpenHelper;
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mySQLiteOpenHelper = new MySQLiteOpenHelper(this);
         sharedPreferences = getSharedPreferences(getPackageName() + "_preferences", Context.MODE_PRIVATE);
+        userInfoSP=getSharedPreferences("user_info",Context.MODE_PRIVATE);
         rememberPass = (CheckBox) findViewById(R.id.remember_pass);
         initViews();
         setupClickListeners();
@@ -49,8 +51,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
+                String username = etUsername.getText().toString().trim();
+                String password = etPassword.getText().toString().trim();
+                if (username.isEmpty()||password.isEmpty()){
+                    Toast.makeText(LoginActivity.this, "账号和密码不能为空", Toast.LENGTH_SHORT).show();
+                }
                 if (mySQLiteOpenHelper == null) {
                     mySQLiteOpenHelper = new MySQLiteOpenHelper(LoginActivity.this);
                 }
@@ -78,7 +83,8 @@ public class LoginActivity extends AppCompatActivity {
                         editor.remove("saved_password");
                         editor.putBoolean("is_remembered", false);
                     }
-                    editor.apply();//异步提交,commit是同步提交
+                    editor.apply();
+                    userInfoSP.edit().putString("account",username).apply();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -102,16 +108,15 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void loadSavedUserInfo() {//加载保存的用户信息
+    private void loadSavedUserInfo() {
         boolean isRemembered = sharedPreferences.getBoolean("is_remembered", false);
         if (isRemembered) {
             String savedUsername = sharedPreferences.getString("saved_username", "");
             String savedPassword = sharedPreferences.getString("saved_password", "");
-            etUsername.setText(savedUsername);//显示用户名
+            etUsername.setText(savedUsername);
             etPassword.setText(savedPassword);
             rememberPass.setChecked(true);
         }
     }
-
 
 }

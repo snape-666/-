@@ -30,10 +30,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 输入框 -->
-
-        <!-- 添加按钮 -->
-
         <EditText
             android:id="@+id/input_edit_text"
             android:layout_width="0dp"
@@ -41,6 +37,7 @@
             android:hint="添加事项"
             android:inputType="textCapSentences|textMultiLine"
             android:imeOptions="actionDone"
+            android:privateImeOptions="nm"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/add_button"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -70,13 +67,12 @@
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_container">
 
-        <TextView
+       <TextView
             android:id="@+id/hide_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
